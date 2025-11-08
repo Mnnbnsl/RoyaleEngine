@@ -10,7 +10,7 @@ class Arena;
 class Card
 {
 protected:
-    string cardName;
+    std::string cardName;
     int elixirCost;
 
 public:
@@ -20,7 +20,7 @@ public:
     virtual ~Card() {}
 
     // getters
-    string getCardName() const { return cardName; }
+    std::string getCardName() const { return cardName; }
     int getElixirCost() const { return elixirCost; }
 
     virtual void deploy(Arena &arena, Location loc) = 0;
