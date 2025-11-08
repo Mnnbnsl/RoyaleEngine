@@ -9,6 +9,7 @@
 #include "Arena.h"
 #include "Knight.h"
 #include "Archer.h"
+#include "Cannon.h"
 
 // --- NEW HELPER FUNCTION ---
 /**
@@ -37,17 +38,22 @@ int main() {
 
     Arena arena(20, 10);
     Troop* knight = new Knight();
-    Troop* archer = new Archer();
+    //Troop* archer = new Archer();
+    Building* cannon = new Cannon();
 
     knight->deploy(arena, Location(2, 5));
     arena.addTroop(knight); 
 
-    archer->deploy(arena, Location(17, 5));
-    arena.addTroop(archer); 
+    // archer->deploy(arena, Location(17, 5));
+    // arena.addTroop(archer);
+    
+    cannon->deploy(arena, Location(17, 5));
+    arena.addBuilding(cannon);
 
     std::cout << "\n--- INITIAL STATE ---" << std::endl;
     arena.render();
-    std::cout << "A Knight and an Archer face off! Press Enter to start..." << std::endl;
+    //std::cout << "A Knight and an Archer face off! Press Enter to start..." << std::endl;
+    std::cout << "A Knight charges a Cannon! Press Enter to start..." << std::endl;
     std::cin.get(); 
 
     // --- 2. SIMULATION LOOP ---
@@ -70,10 +76,10 @@ int main() {
         // 4. Check for winner
         if (!knight->isAlive()) {
             std::cout << "\n--- GAME OVER ---" << std::endl;
-            std::cout << "The Archer wins!" << std::endl;
+            std::cout << "The Cannon wins!" << std::endl;
             break; 
         }
-        if (!archer->isAlive()) {
+        if (!cannon->isAlive()) {
             std::cout << "\n--- GAME OVER ---" << std::endl;
             std::cout << "The Knight wins!" << std::endl;
             break; 
@@ -85,8 +91,8 @@ int main() {
 
     // --- 3. CLEANUP PHASE ---
     std::cout << "\n--- SIMULATION END ---" << std::endl;
-    
-    if (knight->isAlive() && archer->isAlive()) {
+
+    if (knight->isAlive() && cannon->isAlive()) {
         std::cout << "Time's up! Both are still standing." << std::endl;
     }
 

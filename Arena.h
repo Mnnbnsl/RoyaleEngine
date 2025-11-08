@@ -79,7 +79,6 @@ public:
         this->allTargets.push_back(building);
     }
 
-    // --- NEW ---
     /**
      * @brief Public method for objects to log their actions.
      */
@@ -87,16 +86,22 @@ public:
         eventLog.push_back(event);
     }
 
-    // --- UPDATED ---
     void update() {
-        // 1. Clear the log for the new tick
         eventLog.clear();
-        std::cout << "--- TICK START ---" << std::endl; // This log is fine
 
-        // 2. ** POLYMORPHISM **
+        // 1. ** POLYMORPHISM **
+        // Update all troops
         for (Troop* troop : troops) {
             if (troop->isAlive()) {
-                troop->act(*this); // This will now call logEvent()
+                troop->act(*this);
+            }
+        }
+        
+        // 2. ** POLYMORPHISM **
+        // Update all buildings
+        for (Building* building : buildings) {
+            if (building->isAlive()) {
+                building->act(*this); // Call the building's "brain"
             }
         }
         
