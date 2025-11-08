@@ -1,9 +1,8 @@
 // main.cpp
-
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include <cstdlib> // For system()
+#include <cstdlib> 
 
 // --- Our OOP Class Headers ---
 #include "Arena.h"
@@ -14,7 +13,6 @@
 // --- NEW HELPER FUNCTION ---
 /**
  * @brief Clears the console screen.
- * This is OS-dependent. 'cls' is for Windows, 'clear' is for Linux/macOS.
  */
 void clearConsole() {
 #ifdef _WIN32
@@ -38,30 +36,29 @@ int main() {
 
     Arena arena(20, 10);
     Troop* knight = new Knight();
-    //Troop* archer = new Archer();
-    Building* cannon = new Cannon();
+    Troop* archer = new Archer();
+    //Building* cannon = new Cannon();
 
     knight->deploy(arena, Location(2, 5));
     arena.addTroop(knight); 
 
-    // archer->deploy(arena, Location(17, 5));
-    // arena.addTroop(archer);
+    archer->deploy(arena, Location(17, 5));
+    arena.addTroop(archer);
     
-    cannon->deploy(arena, Location(17, 5));
-    arena.addBuilding(cannon);
+    // cannon->deploy(arena, Location(17, 5));
+    // arena.addBuilding(cannon);
 
     std::cout << "\n--- INITIAL STATE ---" << std::endl;
     arena.render();
-    //std::cout << "A Knight and an Archer face off! Press Enter to start..." << std::endl;
-    std::cout << "A Knight charges a Cannon! Press Enter to start..." << std::endl;
-    std::cin.get(); 
+    std::cout << "A Knight and an Archer face off! Press Enter to start..." << std::endl;
+    // std::cout << "A Knight charges a Cannon! Press Enter to start..." << std::endl;
+    // std::cin.get(); 
 
     // --- 2. SIMULATION LOOP ---
     for (int tick = 1; tick <= 30; ++tick) {
         
         // --- UPDATED ---
         // 1. Clear the screen at the start of the frame
-        //clearConsole();
         
         std::cout << "========================================" << std::endl;
         std::cout << "  TICK #" << tick << std::endl;
@@ -76,10 +73,10 @@ int main() {
         // 4. Check for winner
         if (!knight->isAlive()) {
             std::cout << "\n--- GAME OVER ---" << std::endl;
-            std::cout << "The Cannon wins!" << std::endl;
+            std::cout << "The Archer wins!" << std::endl;
             break; 
         }
-        if (!cannon->isAlive()) {
+        if (!archer->isAlive()) {
             std::cout << "\n--- GAME OVER ---" << std::endl;
             std::cout << "The Knight wins!" << std::endl;
             break; 
@@ -92,7 +89,7 @@ int main() {
     // --- 3. CLEANUP PHASE ---
     std::cout << "\n--- SIMULATION END ---" << std::endl;
 
-    if (knight->isAlive() && cannon->isAlive()) {
+    if (knight->isAlive() && archer->isAlive()) {
         std::cout << "Time's up! Both are still standing." << std::endl;
     }
 

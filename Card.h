@@ -1,17 +1,18 @@
+// Card.h
 #pragma once
 #include <string>
 #include <iostream>
 #include "Location.h"
 
-// Forward declaration of Arena to avoid circular dependencies
+// Forward declare Arena to break circular include
 class Arena;
 
-// main abstract base class for all cards 
+// Base class for all cards (troops, buildings, etc.)
 class Card
 {
 protected:
-    std::string cardName;
-    int elixirCost;
+    std::string cardName;  // Card's display name
+    int elixirCost;        // Cost to play
 
 public:
     Card(std::string name, int cost)
@@ -19,9 +20,10 @@ public:
 
     virtual ~Card() {}
 
-    // getters
+    // Simple getters
     std::string getCardName() const { return cardName; }
     int getElixirCost() const { return elixirCost; }
 
+    // Must be implemented by child classes
     virtual void deploy(Arena &arena, Location loc) = 0;
 };

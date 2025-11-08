@@ -3,7 +3,7 @@
 #include "Troop.h"
 #include "Arena.h"
 #include <iostream>
-#include <string>     // For std::to_string
+#include <string>    
 
 class Knight : public Troop {
 public:
@@ -11,12 +11,9 @@ public:
     virtual ~Knight() {}
 
     char getSymbol() const override { return 'K'; }
+   
+    // Knight's "brain" now reports actions to the Arena's log instead of printing directly to console.
 
-    // --- UPDATED ---
-    /**
-     * Knight's "brain" now reports actions to the Arena's log
-     * instead of printing directly to console.
-     */
     void act(Arena& arena) override {
         IDamageable* target = arena.getClosestEnemy(this);
 

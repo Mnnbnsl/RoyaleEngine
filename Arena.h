@@ -6,7 +6,7 @@
 #include <iostream>
 #include <limits>
 #include <algorithm>
-#include <sstream> // For std::stringstream
+#include <sstream> 
 
 #include "Troop.h"
 #include "Building.h"
@@ -19,25 +19,22 @@ private:
     int height;
     std::vector<Troop*> troops;
     std::vector<Building*> buildings;
-    std::vector<IDamageable*> allTargets;
+    std::vector<IDamageable*> allTargets;  // Master list for AI targeting
 
-    // --- NEW ---
-    // A log to store events that happen each tick.
+  
+    // Stores events each tick for display
     std::vector<std::string> eventLog;
 
+    // Remove dead units from all lists
     void cleanupDeadObjects() {
-        // This function is complex but correct. No changes needed.
+        // Erase-remove idiom: filter out dead targets
         auto newEnd = std::remove_if(allTargets.begin(), allTargets.end(),
             [](const IDamageable* target) {
-                if (!target->isAlive()) {
-                    // Important: delete the object before removing its pointer
-                    // delete target; // This is complex, let's stick to deleting in ~Arena
-                    return true;
-                }
-                return false;
+                return !target->isAlive();  // Keep only alive ones
             });
         allTargets.erase(newEnd, allTargets.end());
 
+        // Clean up troop and building lists separately
         troops.erase(std::remove_if(troops.begin(), troops.end(),
             [](const Troop* t) { return !t->isAlive(); }), troops.end());
             
@@ -53,71 +50,59 @@ public:
     ~Arena() {
         std::cout << "Arena being destroyed. Cleaning up..." << std::endl;
         
-        // --- UPDATED for safer cleanup ---
-        // We must delete from allTargets, as it's the master list.
-        // But we must first cast them back to their original type? No,
-        // we can just delete the pointers from the original lists.
-        for (Troop* t : troops) {
-             delete t; 
-        }
-        for (Building* b : buildings) { 
-            delete b; 
-        }
+        // Delete actual objects from their original vectors
+        for (Troop* t : troops)     { delete t; }
+        for (Building* b : buildings) { delete b; }
         
+        // Clear all containers
         troops.clear();
         buildings.clear();
         allTargets.clear();
     }
 
     void addTroop(Troop* troop) {
-        this->troops.push_back(troop);
-        this->allTargets.push_back(troop);
+        troops.push_back(troop);
+        allTargets.push_back(troop);  // So AI can see it
     }
 
     void addBuilding(Building* building) {
-        this->buildings.push_back(building);
-        this->allTargets.push_back(building);
+        buildings.push_back(building);
+        allTargets.push_back(building);
     }
 
-    /**
-     * @brief Public method for objects to log their actions.
-     */
+    // Let troops/buildings report what they did
     void logEvent(const std::string& event) {
         eventLog.push_back(event);
     }
 
+    // Main game loop step
     void update() {
-        eventLog.clear();
+        eventLog.clear();  // Fresh log each turn
 
-        // 1. ** POLYMORPHISM **
-        // Update all troops
+        // Let troops act (move/attack)
         for (Troop* troop : troops) {
             if (troop->isAlive()) {
                 troop->act(*this);
             }
         }
         
-        // 2. ** POLYMORPHISM **
-        // Update all buildings
+        // Let buildings act (e.g., towers shoot)
         for (Building* building : buildings) {
             if (building->isAlive()) {
-                building->act(*this); // Call the building's "brain"
+                building->act(*this);
             }
         }
         
-        // 3. Clean up
+        // Remove dead units
         cleanupDeadObjects();
     }
 
-    // --- UPDATED ---
-    /**
-     * @brief Renders the grid, unit health, and event log.
-     */
+    // Draw the arena, status, and action log
     void render() const {
-        // 1. Create the grid
+        // Build empty grid
         std::vector<std::string> grid(height, std::string(width, '.'));
 
-        // 2. Draw buildings
+        // Place buildings
         for (const Building* b : buildings) {
             Location loc = b->getLocation();
             if (loc.getX() >= 0 && loc.getX() < width && loc.getY() >= 0 && loc.getY() < height) {
@@ -125,7 +110,7 @@ public:
             }
         }
         
-        // 3. Draw troops
+        // Place troops (on top of buildings if overlap)
         for (const Troop* t : troops) {
             Location loc = t->getLocation();
             if (loc.getX() >= 0 && loc.getX() < width && loc.getY() >= 0 && loc.getY() < height) {
@@ -133,14 +118,14 @@ public:
             }
         }
 
-        // 4. Print the grid
+        // Print grid with borders
         std::cout << "+" << std::string(width, '-') << "+" << std::endl;
         for (int y = 0; y < height; ++y) {
             std::cout << "|" << grid[y] << "|" << std::endl;
         }
         std::cout << "+" << std::string(width, '-') << "+" << std::endl;
 
-        // --- NEW: Print Health Status ---
+        // Print Health Status
         std::cout << "--- STATUS ---" << std::endl;
         for (const Troop* t : troops) {
             std::cout << "  " << t->Card::getCardName() << " HP: " << t->getHealth() << std::endl;
@@ -149,7 +134,7 @@ public:
             std::cout << "  " << b->Card::getCardName() << " HP: " << b->getHealth() << std::endl;
         }
         
-        // --- NEW: Print Event Log ---
+        // Print Event Log
         std::cout << "--- LOG ---" << std::endl;
         if (eventLog.empty()) {
             std::cout << "  (No actions)" << std::endl;
@@ -159,38 +144,32 @@ public:
         }
     }
 
-    // --- AI Helper Methods (No changes needed) ---
+    // ---AI Helper Methods--- 
     
+    // Find nearest alive enemy (from any faction)
     IDamageable* getClosestEnemy(const IDamageable* attacker) const {
         IDamageable* closestTarget = nullptr;
         int minDistance = std::numeric_limits<int>::max();
         Location attackerLoc = attacker->getLocation();
 
-        // This loop checks *all* targets
         for (IDamageable* target : allTargets) {
-            // Skip the target if it is the attacker itself.
-            if (target == attacker) {
-                continue; 
-            }
+            if (target == attacker || !target->isAlive()) continue;
 
-            if (target->isAlive()) {
-                int dist = attackerLoc.distanceTo(target->getLocation());
-                if (dist < minDistance) {
-                    minDistance = dist;
-                    closestTarget = target;
-                }
+            int dist = attackerLoc.distanceTo(target->getLocation());
+            if (dist < minDistance) {
+                minDistance = dist;
+                closestTarget = target;
             }
         }
         return closestTarget;
     }
 
+    // Get all alive enemies within radius
     std::vector<IDamageable*> getEnemiesInRadius(Location atLoc, int radius) const {
         std::vector<IDamageable*> targetsInRadius;
         for (IDamageable* target : allTargets) {
-            if (target->isAlive()) {
-                if (atLoc.distanceTo(target->getLocation()) <= radius) {
-                    targetsInRadius.push_back(target);
-                }
+            if (target->isAlive() && atLoc.distanceTo(target->getLocation()) <= radius) {
+                targetsInRadius.push_back(target);
             }
         }
         return targetsInRadius;

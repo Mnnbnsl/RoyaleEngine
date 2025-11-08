@@ -3,24 +3,22 @@
 #include "Troop.h"
 #include "Arena.h"
 #include <iostream>
-#include <string>     // For std::to_string
+#include <string>     
 
 class Archer : public Troop {
 private:
-    const int ATTACK_RANGE = 5;
+    const int ATTACK_RANGE = 5;  // Max distance to shoot
 
 public:
-    Archer() : Troop("Archer", 3, 250, 75) {}
+    Archer() : Troop("Archer", 3, 250, 75) {}  // name, speed, health, damage
     virtual ~Archer() {}
 
-    char getSymbol() const override { return 'A'; }
+    char getSymbol() const override { return 'A'; }  // Symbol on the board
 
-    // --- UPDATED ---
-    /**
-     * Archer's "brain" also reports actions to the Arena's log.
-     */
+    // Archer's "brain" also reports actions to the Arena's log.
+    
     void act(Arena& arena) override {
-        IDamageable* target = arena.getClosestEnemy(this);
+        IDamageable* target = arena.getClosestEnemy(this);  // Find nearest enemy
 
         if (target != nullptr && target->isAlive()) {
             Location targetLoc = target->getLocation();
@@ -28,7 +26,7 @@ public:
             int distance = currentLoc.distanceTo(targetLoc);
 
             if (distance <= ATTACK_RANGE) {
-                // Attack
+                // Attack if in range
                 int dmg = this->getDamage();
                 target->takeDamage(dmg);
 
@@ -38,14 +36,17 @@ public:
                 arena.logEvent(log);
 
             } else {
-                // Move
+                // Move closer
                 int dx = targetLoc.getX() - currentLoc.getX();
                 int dy = targetLoc.getY() - currentLoc.getY();
                 Location newLoc = currentLoc;
                 
+                // Move horizontally if that's the bigger gap
                 if (std::abs(dx) > std::abs(dy)) {
                     newLoc = Location(currentLoc.getX() + (dx > 0 ? 1 : -1), currentLoc.getY());
-                } else if (dy != 0) {
+                } 
+                // Otherwise move vertically
+                else if (dy != 0) {
                     newLoc = Location(currentLoc.getX(), currentLoc.getY() + (dy > 0 ? 1 : -1));
                 }
 

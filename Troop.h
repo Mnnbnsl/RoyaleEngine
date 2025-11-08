@@ -23,8 +23,6 @@ public:
 
     virtual ~Troop() {} 
 
-    // --- UPDATED ---
-    // This method is now "silent". It just changes the health.
     // The 'act' method will be responsible for reporting the damage.
     void takeDamage(int amount) override {
         this->health -= amount;
@@ -39,7 +37,6 @@ public:
     void deploy(Arena& arena, Location loc) override {
         this->location = loc;
         std::cout << Card::getCardName() << " deployed at " << loc.toString() << std::endl;
-        // This 'std::cout' is OK because deploy only happens once.
     }
 
     virtual std::string getCardName() const override {
@@ -48,9 +45,7 @@ public:
     
     virtual void act(Arena& arena) = 0;
     virtual char getSymbol() const = 0;
-
-    // --- UPDATED ---
-    // This now implements the new method from IDamageable
+    
     Location getLocation() const override { return location; }
     
     int getDamage() const { return damage; }

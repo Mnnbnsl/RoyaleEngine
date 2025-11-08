@@ -10,7 +10,7 @@ class Building : public Card, public IDamageable {
 private:
     int maxHealth;
     int health;
-    int lifetime; // We're not using this yet, but it's good design
+    int lifetime;
     Location location;
 
 public:
@@ -22,21 +22,19 @@ public:
 
     virtual ~Building() {}
 
-    // --- Implementation of IDamageable ---
+    // --- IDamageable interface ---
     void takeDamage(int amount) override {
         this->health -= amount;
         if (this->health < 0) this->health = 0;
-        // This is silent, as requested
     }
 
     int getHealth() const override { return health; }
-    bool isAlive() const override { return this->health > 0; } // Simplified for now
+    bool isAlive() const override { return this->health > 0; }
 
-    // --- Implementation of Card ---
+    // --- Card interface ---
     void deploy(Arena& arena, Location loc) override {
         this->location = loc;
         std::cout << this->Card::getCardName() << " deployed at " << loc.toString() << std::endl;
-        // The main.cpp will call arena.addBuilding(this)
     }
     
     Location getLocation() const override { return location; }
@@ -44,15 +42,9 @@ public:
     virtual std::string getCardName() const override {
         return Card::getCardName();
     }
-    // --- UPDATED ---
-    /**
-     * @brief The "brain" of the building (e.g., to attack targets).
-     * This is now pure virtual, just like in the Troop class.
-     */
-    virtual void act(Arena& arena) = 0;
 
-    /**
-     * @return The character symbol for drawing this building.
-     */
-    virtual char getSymbol() const = 0;
+    // --- Building behavior ---
+    virtual void act(Arena& arena) = 0;  // Pure virtual - each building decides what to do
+
+    virtual char getSymbol() const = 0;  // Symbol to show on the map
 };
