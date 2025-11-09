@@ -38,7 +38,6 @@ RoyaleEngine/
 ├── src/
 │   ├── *.cpp               # Implementations
 │   └── main.cpp            # Demo: Knight vs Archer duel
-├── CMakeLists.txt
 ├── README.md               # This file
 └── docs/
     └── RoyaleEngine.pdf    # Full project report
