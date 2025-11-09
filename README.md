@@ -42,4 +42,14 @@ RoyaleEngine/
 ├── README.md               # This file
 └── docs/
     └── RoyaleEngine.pdf    # Full project report
+```
+
+## UML Diagram
+
+![UML class diagram showing inheritance](assets/UML.png)
+
+*Figure – UML diagram*
+
+---
+
 
